@@ -10,6 +10,8 @@ import com.apollographql.apollo.exception.ApolloNetworkException;
 import com.apollographql.apollo.exception.ApolloParseException;
 import com.apollographql.apollo.internal.util.Cancelable;
 
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -54,12 +56,33 @@ public interface ApolloCall<T> extends Cancelable {
   @Nonnull ApolloCall<T> httpCacheControl(@Nonnull HttpCacheControl httpCacheControl);
 
   /**
-   * Sets the {@link CacheControl} strategy for an ApolloCall object.
+   * Sets the {@link CacheControl} strategy for an ApolloCall object. No cache headers will be used.
    *
    * @param cacheControl the CacheControl strategy to set
    * @return The ApolloCall object with the provided CacheControl strategy
    */
   @Nonnull ApolloCall<T> cacheControl(@Nonnull CacheControl cacheControl);
+
+  /**
+   * Sets the cache headers to use for this call. The default {@link CacheControl} will be used.
+   *
+   * @param cacheHeaders the cache headers that will be passed with records generated from this request to {@link
+   *                     com.apollographql.apollo.cache.normalized.NormalizedCache}. Standardized cache headers are
+   *                     defined in {@link com.apollographql.apollo.cache.normalized.CacheHeaderSpec}.
+   * @return The ApolloCall object with the provided CacheControl strategy
+   */
+  @Nonnull ApolloCall<T> cacheControl(@Nonnull Map<String, String> cacheHeaders);
+
+  /**
+   * Sets the {@link CacheControl} strategy for an ApolloCall object.
+   *
+   * @param cacheControl the CacheControl strategy to set
+   * @param cacheHeaders the cache headers that will be passed with records generated from this request to {@link
+   *                     com.apollographql.apollo.cache.normalized.NormalizedCache}. Standardized cache headers are
+   *                     defined in {@link com.apollographql.apollo.cache.normalized.CacheHeaderSpec}.
+   * @return The ApolloCall object with the provided CacheControl strategy
+   */
+  @Nonnull ApolloCall<T> cacheControl(@Nonnull CacheControl cacheControl, @Nonnull Map<String, String> cacheHeaders);
 
   /**
    * Creates a new, identical call to this one which can be enqueued or executed even if this call has already been.

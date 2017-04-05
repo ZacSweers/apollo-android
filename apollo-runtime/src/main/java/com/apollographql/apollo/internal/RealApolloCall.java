@@ -24,6 +24,7 @@ import com.apollographql.apollo.internal.util.ApolloLogger;
 import com.squareup.moshi.Moshi;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
@@ -46,6 +47,7 @@ import static com.apollographql.apollo.api.internal.Utils.checkNotNull;
   final Map<ScalarType, CustomTypeAdapter> customTypeAdapters;
   final ApolloStore apolloStore;
   final CacheControl cacheControl;
+  final Map<String, String> cacheHeaders;
   final ApolloInterceptorChain interceptorChain;
   final ExecutorService dispatcher;
   final ApolloLogger logger;
@@ -55,7 +57,7 @@ import static com.apollographql.apollo.api.internal.Utils.checkNotNull;
   public RealApolloCall(Operation operation, HttpUrl serverUrl, Call.Factory httpCallFactory, HttpCache httpCache,
       HttpCacheControl httpCacheControl, Moshi moshi, ResponseFieldMapper responseFieldMapper,
       Map<ScalarType, CustomTypeAdapter> customTypeAdapters, ApolloStore apolloStore, CacheControl cacheControl,
-      ExecutorService dispatcher, ApolloLogger logger) {
+      Map<String, String> cacheHeaders, ExecutorService dispatcher, ApolloLogger logger) {
     this.operation = operation;
     this.serverUrl = serverUrl;
     this.httpCallFactory = httpCallFactory;
@@ -66,12 +68,13 @@ import static com.apollographql.apollo.api.internal.Utils.checkNotNull;
     this.customTypeAdapters = customTypeAdapters;
     this.apolloStore = apolloStore;
     this.cacheControl = cacheControl;
+    this.cacheHeaders = cacheHeaders;
     this.dispatcher = dispatcher;
     this.logger = logger;
 
     interceptorChain = new RealApolloInterceptorChain(operation, Arrays.asList(
-        new ApolloCacheInterceptor(apolloStore, cacheControl, responseFieldMapper, customTypeAdapters, dispatcher,
-            logger),
+        new ApolloCacheInterceptor(apolloStore, cacheControl, cacheHeaders, responseFieldMapper, customTypeAdapters,
+            dispatcher, logger),
         new ApolloParseInterceptor(httpCache, apolloStore.networkResponseNormalizer(), responseFieldMapper,
             customTypeAdapters, logger),
         new ApolloServerInterceptor(serverUrl, httpCallFactory, httpCacheControl, false, moshi, logger)
@@ -130,16 +133,25 @@ import static com.apollographql.apollo.api.internal.Utils.checkNotNull;
     }
     return new RealApolloCall<>(operation, serverUrl, httpCallFactory, httpCache,
         checkNotNull(httpCacheControl, "httpCacheControl == null"), moshi, responseFieldMapper, customTypeAdapters,
-        apolloStore, cacheControl, dispatcher, logger);
+        apolloStore, cacheControl, cacheHeaders, dispatcher, logger);
   }
 
   @Nonnull @Override public RealApolloCall<T> cacheControl(@Nonnull CacheControl cacheControl) {
+    return cacheControl(cacheControl, Collections.<String, String>emptyMap());
+  }
+
+  @Nonnull @Override public RealApolloCall<T> cacheControl(@Nonnull Map<String, String> cacheHeaders) {
+    return cacheControl(cacheControl, cacheHeaders);
+  }
+
+  @Nonnull @Override
+  public RealApolloCall<T> cacheControl(@Nonnull CacheControl cacheControl, @Nonnull Map<String, String> cacheHeaders) {
     synchronized (this) {
       if (executed) throw new IllegalStateException("Already Executed");
     }
     return new RealApolloCall<>(operation, serverUrl, httpCallFactory, httpCache, httpCacheControl, moshi,
         responseFieldMapper, customTypeAdapters, apolloStore, checkNotNull(cacheControl, "cacheControl == null"),
-        dispatcher, logger);
+        checkNotNull(cacheHeaders, "cacheHeaders == null"), dispatcher, logger);
   }
 
   @Override public void cancel() {
@@ -153,6 +165,6 @@ import static com.apollographql.apollo.api.internal.Utils.checkNotNull;
 
   @Override @Nonnull public RealApolloCall<T> clone() {
     return new RealApolloCall<>(operation, serverUrl, httpCallFactory, httpCache, httpCacheControl, moshi,
-        responseFieldMapper, customTypeAdapters, apolloStore, cacheControl, dispatcher, logger);
+        responseFieldMapper, customTypeAdapters, apolloStore, cacheControl, cacheHeaders, dispatcher, logger);
   }
 }

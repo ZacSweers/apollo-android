@@ -54,17 +54,20 @@ import static com.apollographql.apollo.api.internal.Utils.checkNotNull;
 public final class ApolloCacheInterceptor implements ApolloInterceptor {
   private final ApolloStore apolloStore;
   private final CacheControl cacheControl;
+  private final Map<String, String> cacheHeaders;
   private final ResponseFieldMapper responseFieldMapper;
   private final Map<ScalarType, CustomTypeAdapter> customTypeAdapters;
   private final ExecutorService dispatcher;
   private final ApolloLogger logger;
 
   public ApolloCacheInterceptor(@Nonnull ApolloStore apolloStore, @Nonnull CacheControl cacheControl,
+      @Nonnull Map<String, String> cacheHeaders,
       @Nonnull ResponseFieldMapper responseFieldMapper,
       @Nonnull Map<ScalarType, CustomTypeAdapter> customTypeAdapters,
       @Nonnull ExecutorService dispatcher, @Nonnull ApolloLogger logger) {
     this.apolloStore = checkNotNull(apolloStore, "cache == null");
     this.cacheControl = checkNotNull(cacheControl, "cacheControl == null");
+    this.cacheHeaders = checkNotNull(cacheHeaders, "cacheHeaders == null");
     this.responseFieldMapper = checkNotNull(responseFieldMapper, "responseFieldMapper == null");
     this.customTypeAdapters = checkNotNull(customTypeAdapters, "customTypeAdapters == null");
     this.dispatcher = checkNotNull(dispatcher, "dispatcher == null");
@@ -145,13 +148,14 @@ public final class ApolloCacheInterceptor implements ApolloInterceptor {
     return apolloStore.readTransaction(new Transaction<ReadableCache, Response>() {
       @Nullable @Override public Response execute(ReadableCache cache) {
         cacheResponseNormalizer.willResolveRootQuery(operation);
-        Record rootRecord = cache.read(CacheKeyResolver.rootKeyForOperation(operation).key());
+        Record rootRecord = cache.read(CacheKeyResolver.rootKeyForOperation(operation).key(), cacheHeaders);
         if (rootRecord == null) {
           return new Response(operation);
         }
         try {
           RealResponseReader<Record> responseReader = new RealResponseReader<>(operation, rootRecord,
-              new CacheFieldValueResolver(cache, operation.variables()), customTypeAdapters, cacheResponseNormalizer);
+              new CacheFieldValueResolver(cache, operation.variables(), cacheHeaders), customTypeAdapters,
+              cacheResponseNormalizer);
           return new Response(operation, responseFieldMapper.map(responseReader), null,
               cacheResponseNormalizer.dependentKeys());
         } catch (final Exception e) {
@@ -180,7 +184,7 @@ public final class ApolloCacheInterceptor implements ApolloInterceptor {
         @Override public void run() {
           Set<String> changedKeys = apolloStore.writeTransaction(new Transaction<WriteableCache, Set<String>>() {
             @Nullable @Override public Set<String> execute(WriteableCache cache) {
-              return cache.merge(records);
+              return cache.merge(records, cacheHeaders);
             }
           });
           apolloStore.publish(changedKeys);

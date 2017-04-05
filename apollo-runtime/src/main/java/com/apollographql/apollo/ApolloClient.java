@@ -23,6 +23,7 @@ import com.squareup.moshi.JsonWriter;
 import com.squareup.moshi.Moshi;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -71,6 +72,7 @@ public final class ApolloClient implements ApolloCall.Factory, ApolloPrefetch.Fa
   private final ExecutorService dispatcher;
   private final HttpCacheControl defaultHttpCacheControl;
   private final CacheControl defaultCacheControl;
+  private final Map<String, String> defaultCacheHeaders;
   private final ApolloLogger logger;
 
   private ApolloClient(Builder builder) {
@@ -82,6 +84,7 @@ public final class ApolloClient implements ApolloCall.Factory, ApolloPrefetch.Fa
     this.moshi = builder.moshi;
     this.dispatcher = builder.dispatcher;
     this.defaultHttpCacheControl = builder.defaultHttpCacheControl;
+    this.defaultCacheHeaders = builder.defaultCacheHeaders;
     this.defaultCacheControl = builder.defaultCacheControl;
     this.logger = builder.apolloLogger;
   }
@@ -101,7 +104,7 @@ public final class ApolloClient implements ApolloCall.Factory, ApolloPrefetch.Fa
       }
     }
     return new RealApolloCall<T>(operation, serverUrl, httpCallFactory, httpCache, defaultHttpCacheControl, moshi,
-        responseFieldMapper, customTypeAdapters, apolloStore, defaultCacheControl, dispatcher, logger)
+        responseFieldMapper, customTypeAdapters, apolloStore, defaultCacheControl, defaultCacheHeaders, dispatcher, logger)
         .httpCacheControl(defaultHttpCacheControl)
         .cacheControl(defaultCacheControl);
   }
@@ -155,6 +158,7 @@ public final class ApolloClient implements ApolloCall.Factory, ApolloPrefetch.Fa
     Optional<CacheKeyResolver<Map<String, Object>>> cacheKeyResolver = Optional.absent();
     HttpCacheControl defaultHttpCacheControl = HttpCacheControl.CACHE_FIRST;
     CacheControl defaultCacheControl = CacheControl.CACHE_FIRST;
+    Map<String, String> defaultCacheHeaders = Collections.emptyMap();
     final Map<ScalarType, CustomTypeAdapter> customTypeAdapters = new LinkedHashMap<>();
     private final Moshi.Builder moshiBuilder = new Moshi.Builder();
     Moshi moshi;
@@ -279,7 +283,19 @@ public final class ApolloClient implements ApolloCall.Factory, ApolloPrefetch.Fa
      * @return The {@link Builder} object to be used for chaining method calls
      */
     public Builder defaultCacheControl(@Nonnull CacheControl cacheControl) {
+      return defaultCacheControl(cacheControl, Collections.<String, String>emptyMap());
+    }
+
+    /**
+     * Set the default {@link CacheControl} strategy and cacheHeaders that will be passed
+     * to the {@link ApolloClient}.
+     *
+     * @return The {@link Builder} object to be used for chaining method calls
+     */
+    public Builder defaultCacheControl(@Nonnull CacheControl cacheControl,
+        @Nonnull Map<String, String> cacheHeaders) {
       this.defaultCacheControl = checkNotNull(cacheControl, "cacheControl == null");
+      this.defaultCacheHeaders = checkNotNull(cacheHeaders, "cacheHeaders == null");
       return this;
     }
 

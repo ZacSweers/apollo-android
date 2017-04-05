@@ -8,6 +8,7 @@ import com.apollographql.apollo.cache.normalized.RecordFieldAdapter;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -26,18 +27,18 @@ public final class InMemoryNormalizedCache extends NormalizedCache
     this.recordSet = new RecordSet();
   }
 
-  @Nonnull public Record loadRecord(String key) {
+  @Nonnull public Record loadRecord(String key, Map<String, String> cacheHeaders) {
     return recordSet.get(key);
   }
 
-  @Nonnull public Set<String> merge(Record apolloRecord) {
+  @Nonnull public Set<String> merge(Record apolloRecord, Map<String, String> cacheHeaders) {
     return recordSet.merge(apolloRecord);
   }
 
-  @Nonnull @Override public Set<String> merge(Collection<Record> recordSet) {
+  @Nonnull @Override public Set<String> merge(Collection<Record> recordSet, Map<String, String> cacheHeaders) {
     Set<String> changedKeys = new LinkedHashSet<>();
     for (Record record : recordSet) {
-      changedKeys.addAll(merge(record));
+      changedKeys.addAll(merge(record, cacheHeaders));
     }
     return changedKeys;
   }

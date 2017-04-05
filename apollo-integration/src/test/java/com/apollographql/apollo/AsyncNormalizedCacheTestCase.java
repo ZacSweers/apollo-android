@@ -62,6 +62,11 @@ public class AsyncNormalizedCacheTestCase {
     }
   }
 
+  @After
+  public void tearDown() throws IOException {
+    server.shutdown();
+  }
+
   private MockResponse mockResponse(String fileName) throws IOException, ApolloException {
     return new MockResponse().setChunkedBody(Utils.readFileToString(getClass(), "/" + fileName), 32);
   }

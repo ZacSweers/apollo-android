@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
 import com.apollographql.apollo.api.internal.Optional;
+import com.apollographql.apollo.cache.normalized.CacheHeaderSpec;
 import com.apollographql.apollo.cache.normalized.NormalizedCache;
 import com.apollographql.apollo.cache.normalized.Record;
 import com.apollographql.apollo.cache.normalized.RecordFieldAdapter;
@@ -12,6 +13,7 @@ import com.apollographql.apollo.cache.normalized.RecordFieldAdapter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -53,11 +55,14 @@ public final class SqlNormalizedCache extends NormalizedCache {
     deleteAllRecordsStatement = database.compileStatement(DELETE_ALL_RECORD_STATEMENT);
   }
 
-  @Nullable @Override public Record loadRecord(String key) {
+  @Nullable public Record loadRecord(String key, Map<String, String> cacheHeaders) {
     return selectRecordForKey(key).orNull();
   }
 
-  @Nonnull @Override public Set<String> merge(Record apolloRecord) {
+  @Nonnull public Set<String> merge(Record apolloRecord, Map<String, String> cacheHeaders) {
+    if (cacheHeaders.containsKey(CacheHeaderSpec.DO_NOT_CACHE)) {
+      return Collections.emptySet();
+    }
     Optional<Record> optionalOldRecord = selectRecordForKey(apolloRecord.key());
     Set<String> changedKeys;
     if (!optionalOldRecord.isPresent()) {
@@ -73,11 +78,14 @@ public final class SqlNormalizedCache extends NormalizedCache {
     return changedKeys;
   }
 
-  @Nonnull @Override public Set<String> merge(Collection<Record> recordSet) {
+  @Nonnull @Override public Set<String> merge(Collection<Record> recordSet, Map<String, String> cacheHeaders) {
+    if (cacheHeaders.containsKey(CacheHeaderSpec.DO_NOT_CACHE)) {
+      return Collections.emptySet();
+    }
     Set<String> changedKeys = Collections.emptySet();
     try {
       database.beginTransaction();
-      changedKeys = super.merge(recordSet);
+      changedKeys = super.merge(recordSet, cacheHeaders);
       database.setTransactionSuccessful();
     } finally {
       database.endTransaction();
