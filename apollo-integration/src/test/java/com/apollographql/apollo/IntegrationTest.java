@@ -68,20 +68,12 @@ public class IntegrationTest {
         .build();
   }
 
-<<<<<<< HEAD
   @After public void tearDown() {
     try {
       server.shutdown();
     } catch (IOException ignored) {
     }
   }
-=======
-  @After
-  public void tearDown() throws IOException {
-    server.shutdown();
-  }
-
->>>>>>> WIP
 
   @SuppressWarnings("ConstantConditions") @Test public void allPlanetQuery() throws Exception {
     server.enqueue(mockResponse("/HttpCacheTestAllPlanets.json"));

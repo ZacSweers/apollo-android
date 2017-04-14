@@ -104,9 +104,8 @@ public final class ApolloClient implements ApolloCall.Factory, ApolloPrefetch.Fa
       }
     }
     return new RealApolloCall<T>(operation, serverUrl, httpCallFactory, httpCache, defaultHttpCacheControl, moshi,
-        responseFieldMapper, customTypeAdapters, apolloStore, defaultCacheControl, defaultCacheHeaders, dispatcher, logger)
-        .httpCacheControl(defaultHttpCacheControl)
-        .cacheControl(defaultCacheControl);
+        responseFieldMapper, customTypeAdapters, apolloStore, defaultCacheControl, defaultCacheHeaders, dispatcher,
+        logger);
   }
 
   /**

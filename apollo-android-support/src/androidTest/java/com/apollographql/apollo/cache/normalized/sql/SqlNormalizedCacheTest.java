@@ -12,6 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Collections;
+
 import static com.google.common.truth.Truth.assertThat;
 
 @RunWith(AndroidJUnit4.class)
@@ -59,7 +61,7 @@ public class SqlNormalizedCacheTest {
 
   @Test
   public void testRecordSelection_recordNotPresent() {
-    Record record = sqlStore.loadRecord(STANDARD_KEY);
+    Record record = sqlStore.loadRecord(STANDARD_KEY, Collections.<String, String>emptyMap());
     assertThat(record).isNull();
   }
 
@@ -68,7 +70,7 @@ public class SqlNormalizedCacheTest {
     createRecord(STANDARD_KEY);
     sqlStore.merge(Record.builder(STANDARD_KEY)
         .addField("fieldKey", "valueUpdated")
-        .addField("newFieldKey", true).build());
+        .addField("newFieldKey", true).build(), Collections.<String, String>emptyMap());
     Optional<Record> record = sqlStore.selectRecordForKey(STANDARD_KEY);
     assertThat(record.get().fields().get("fieldKey")).isEqualTo("valueUpdated");
     assertThat(record.get().fields().get("newFieldKey")).isEqualTo(true);

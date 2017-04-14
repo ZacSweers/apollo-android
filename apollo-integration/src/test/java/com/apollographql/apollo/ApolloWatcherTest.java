@@ -66,11 +66,6 @@ public class ApolloWatcherTest {
     }
   }
 
-  @After
-  public void tearDown() throws IOException {
-    server.shutdown();
-  }
-
   @Test
   public void testQueryWatcherUpdated_SameQuery_DifferentResults() throws IOException, InterruptedException,
       TimeoutException, ApolloException {

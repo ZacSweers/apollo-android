@@ -50,11 +50,7 @@ public class LruNormalizedCacheTest {
         ()).createNormalizedCache(basicFieldAdapter);
     Record testRecord = createTestRecord("1");
 
-<<<<<<< HEAD
-    lruCache.merge(testRecord);
-=======
-    lruCacheStore.merge(testRecord, Collections.<String, String>emptyMap());
->>>>>>> WIP
+    lruCache.merge(testRecord, Collections.<String, String>emptyMap());
 
     assertTestRecordPresentAndAccurate(testRecord, lruCache);
   }
@@ -68,11 +64,8 @@ public class LruNormalizedCacheTest {
     Record testRecord3 = createTestRecord("3");
 
     List<Record> records = Arrays.asList(testRecord1, testRecord2, testRecord3);
-<<<<<<< HEAD
-    lruCache.merge(records);
-=======
-    lruCacheStore.merge(records, Collections.<String, String>emptyMap());
->>>>>>> WIP
+
+    lruCache.merge(records, Collections.<String, String>emptyMap());
 
     assertTestRecordPresentAndAccurate(testRecord1, lruCache);
     assertTestRecordPresentAndAccurate(testRecord2, lruCache);
@@ -88,28 +81,18 @@ public class LruNormalizedCacheTest {
     Record testRecord3 = createTestRecord("3");
 
     List<Record> inputRecords = Arrays.asList(testRecord1, testRecord2, testRecord3);
-<<<<<<< HEAD
-    lruCache.merge(inputRecords);
-    final Collection<Record> readRecords = lruCache.loadRecords(Arrays.asList("key1", "key2", "key3"));
-=======
-    lruCacheStore.merge(inputRecords, Collections.<String, String>emptyMap());
-    final Collection<Record> readRecords = lruCacheStore.loadRecords(Arrays.asList("key1", "key2", "key3"),
+    lruCache.merge(inputRecords, Collections.<String, String>emptyMap());
+    final Collection<Record> readRecords = lruCache.loadRecords(Arrays.asList("key1", "key2", "key3"),
         Collections.<String, String>emptyMap());
->>>>>>> WIP
     //noinspection ResultOfMethodCallIgnored
     assertThat(readRecords).containsExactlyElementsIn(inputRecords);
   }
 
   @Test
   public void testLoad_recordNotPresent() {
-<<<<<<< HEAD
     LruNormalizedCache lruCache = new LruNormalizedCacheFactory(EvictionPolicy.builder().maxSizeBytes(10 * 1024).build
         ()).createNormalizedCache(basicFieldAdapter);
-    final Record record = lruCache.loadRecord("key1");
-=======
-    LruNormalizedCache lruCacheStore = new LruNormalizedCache(EvictionPolicy.builder().maxSizeBytes(10 * 1024).build());
-    final Record record = lruCacheStore.loadRecord("key1", Collections.<String, String>emptyMap());
->>>>>>> WIP
+    final Record record = lruCache.loadRecord("key1", Collections.<String, String>emptyMap());
     assertThat(record).isNull();
   }
 
@@ -135,22 +118,13 @@ public class LruNormalizedCacheTest {
         testRecord2,
         testRecord3
     );
-<<<<<<< HEAD
-    lruCache.merge(records);
-=======
-    lruCacheStore.merge(records, Collections.<String, String>emptyMap());
->>>>>>> WIP
+    lruCache.merge(records, Collections.<String, String>emptyMap());
 
     //Cache does not reveal exactly how it handles eviction, but appears
     //to evict more than is strictly necessary. Regardless, any sane eviction
     //strategy should leave the third record in this test case, and evict the first record.
-<<<<<<< HEAD
-    assertThat(lruCache.loadRecord("key1")).isNull();
-    assertThat(lruCache.loadRecord("key3")).isNotNull();
-=======
-    assertThat(lruCacheStore.loadRecord("key1", Collections.<String, String>emptyMap())).isNull();
-    assertThat(lruCacheStore.loadRecord("key3", Collections.<String, String>emptyMap())).isNotNull();
->>>>>>> WIP
+    assertThat(lruCache.loadRecord("key1", Collections.<String, String>emptyMap())).isNull();
+    assertThat(lruCache.loadRecord("key3", Collections.<String, String>emptyMap())).isNotNull();
 
   }
 
@@ -176,69 +150,47 @@ public class LruNormalizedCacheTest {
         testRecord2,
         testRecord3
     );
-<<<<<<< HEAD
-    lruCache.merge(records);
+    lruCache.merge(records, Collections.<String, String>emptyMap());
 
     //All records should present
-    assertThat(lruCache.loadRecord("key1")).isNotNull();
-    assertThat(lruCache.loadRecord("key2")).isNotNull();
-    assertThat(lruCache.loadRecord("key3")).isNotNull();
-=======
-    lruCacheStore.merge(records, Collections.<String, String>emptyMap());
-
-    //All records should present
-    assertThat(lruCacheStore.loadRecord("key1", Collections.<String, String>emptyMap())).isNotNull();
-    assertThat(lruCacheStore.loadRecord("key2", Collections.<String, String>emptyMap())).isNotNull();
-    assertThat(lruCacheStore.loadRecord("key3", Collections.<String, String>emptyMap())).isNotNull();
->>>>>>> WIP
+    assertThat(lruCache.loadRecord("key1", Collections.<String, String>emptyMap())).isNotNull();
+    assertThat(lruCache.loadRecord("key2", Collections.<String, String>emptyMap())).isNotNull();
+    assertThat(lruCache.loadRecord("key3", Collections.<String, String>emptyMap())).isNotNull();
 
     Record.Builder largeTestRecordBuilder = Record.builder("key1");
     largeTestRecordBuilder.addField("a", new String(new byte[2000]));
     Record largeTestRecord = largeTestRecordBuilder.build();
 
-<<<<<<< HEAD
-    lruCache.merge(largeTestRecord);
+    lruCache.merge(largeTestRecord, Collections.<String, String>emptyMap());
     //The large record (Record 1) should be evicted. the other small records should remain.
-    assertThat(lruCache.loadRecord("key1")).isNull();
-    assertThat(lruCache.loadRecord("key2")).isNotNull();
-    assertThat(lruCache.loadRecord("key3")).isNotNull();
-=======
-    lruCacheStore.merge(largeTestRecord, Collections.<String, String>emptyMap());
-    //The large record (Record 1) should be evicted. the other small records should remain.
-    assertThat(lruCacheStore.loadRecord("key1", Collections.<String, String>emptyMap())).isNull();
-    assertThat(lruCacheStore.loadRecord("key2", Collections.<String, String>emptyMap())).isNotNull();
-    assertThat(lruCacheStore.loadRecord("key3", Collections.<String, String>emptyMap())).isNotNull();
->>>>>>> WIP
+    assertThat(lruCache.loadRecord("key1", Collections.<String, String>emptyMap())).isNull();
+    assertThat(lruCache.loadRecord("key2", Collections.<String, String>emptyMap())).isNotNull();
+    assertThat(lruCache.loadRecord("key3", Collections.<String, String>emptyMap())).isNotNull();
 
   }
 
   @Test
   public void testDualCacheSingleRecord() {
     LruNormalizedCacheFactory secondaryCacheFactory = new LruNormalizedCacheFactory(EvictionPolicy.NO_EVICTION);
-    LruNormalizedCache primaryCacheStore = new LruNormalizedCacheFactory(EvictionPolicy.NO_EVICTION,
+    LruNormalizedCache primaryCache = new LruNormalizedCacheFactory(EvictionPolicy.NO_EVICTION,
         secondaryCacheFactory).createNormalizedCache(basicFieldAdapter);
 
     Record.Builder recordBuilder = Record.builder("root");
     recordBuilder.addField("bar", "bar");
     final Record record = recordBuilder.build();
-    primaryCacheStore.merge(record, Collections.<String, String>emptyMap());
+    primaryCache.merge(record, Collections.<String, String>emptyMap());
 
     //verify write through behavior
-<<<<<<< HEAD
-    assertThat(primaryCacheStore.loadRecord("root").field("bar")).isEqualTo("bar");
-    assertThat(primaryCacheStore.secondaryCache().loadRecord("root").field("bar")).isEqualTo("bar");
-=======
-    assertThat(primaryCacheStore.loadRecord("root",
+    assertThat(primaryCache.loadRecord("root",
         Collections.<String, String>emptyMap()).field("bar")).isEqualTo("bar");
-    assertThat(secondaryCacheStore.loadRecord("root",
+    assertThat(primaryCache.secondaryCache().loadRecord("root",
         Collections.<String, String>emptyMap()).field("bar")).isEqualTo("bar");
->>>>>>> WIP
   }
 
   @Test
   public void testDualCacheMultipleRecord() {
     LruNormalizedCacheFactory secondaryCacheFactory = new LruNormalizedCacheFactory(EvictionPolicy.NO_EVICTION);
-    LruNormalizedCache primaryCacheStore = new LruNormalizedCacheFactory(EvictionPolicy.NO_EVICTION,
+    LruNormalizedCache primaryCache = new LruNormalizedCacheFactory(EvictionPolicy.NO_EVICTION,
         secondaryCacheFactory).createNormalizedCache(basicFieldAdapter);
 
     Record.Builder recordBuilder = Record.builder("root1");
@@ -256,18 +208,14 @@ public class LruNormalizedCacheTest {
     Collection<Record> records = Arrays.asList(record1, record2, record3);
     Collection<String> keys = Arrays.asList(record1.key(), record2.key(), record3.key());
 
-    primaryCacheStore.merge(records, Collections.<String, String>emptyMap());
+    primaryCache.merge(records, Collections.<String, String>emptyMap());
 
-    assertThat(primaryCacheStore.loadRecords(keys, Collections.<String, String>emptyMap()).size()).isEqualTo(3);
+    assertThat(primaryCache.loadRecords(keys, Collections.<String, String>emptyMap()).size()).isEqualTo(3);
 
     //verify write through behavior
-<<<<<<< HEAD
-    assertThat(primaryCacheStore.loadRecords(keys).size()).isEqualTo(3);
-    assertThat(primaryCacheStore.secondaryCache().loadRecords(keys).size()).isEqualTo(3);
-=======
-    assertThat(primaryCacheStore.loadRecords(keys, Collections.<String, String>emptyMap()).size()).isEqualTo(3);
-    assertThat(secondaryCacheStore.loadRecords(keys, Collections.<String, String>emptyMap()).size()).isEqualTo(3);
->>>>>>> WIP
+    assertThat(primaryCache.loadRecords(keys, Collections.<String, String>emptyMap()).size()).isEqualTo(3);
+    assertThat(primaryCache.secondaryCache()
+        .loadRecords(keys, Collections.<String, String>emptyMap()).size()).isEqualTo(3);
   }
 
   @Test
@@ -296,37 +244,32 @@ public class LruNormalizedCacheTest {
   @Test
   public void testClearPrimaryCache() {
     LruNormalizedCacheFactory secondaryCacheFactory = new LruNormalizedCacheFactory(EvictionPolicy.NO_EVICTION);
-    LruNormalizedCache primaryCacheStore = new LruNormalizedCacheFactory(EvictionPolicy.NO_EVICTION,
+    LruNormalizedCache primaryCache = new LruNormalizedCacheFactory(EvictionPolicy.NO_EVICTION,
         secondaryCacheFactory).createNormalizedCache(basicFieldAdapter);
 
     Record record = Record.builder("key").build();
 
-    primaryCacheStore.merge(record, Collections.<String, String>emptyMap());
-    primaryCacheStore.clearPrimaryCache();
+    primaryCache.merge(record, Collections.<String, String>emptyMap());
+    primaryCache.clearPrimaryCache();
 
-<<<<<<< HEAD
-    assertThat(primaryCacheStore.secondaryCache().loadRecord("key")).isNotNull();
-=======
-    assertThat(secondaryCacheStore.loadRecord("key", Collections.<String, String>emptyMap())).isNotNull();
->>>>>>> WIP
+    assertThat(primaryCache.secondaryCache()
+        .loadRecord("key", Collections.<String, String>emptyMap())).isNotNull();
+    assertThat(primaryCache.secondaryCache()
+        .loadRecord("key", Collections.<String, String>emptyMap())).isNotNull();
   }
 
   @Test
   public void testClearSecondaryCache() {
     LruNormalizedCacheFactory secondaryCacheFactory = new LruNormalizedCacheFactory(EvictionPolicy.NO_EVICTION);
-    LruNormalizedCache primaryCacheStore = new LruNormalizedCacheFactory(EvictionPolicy.NO_EVICTION,
+    LruNormalizedCache primaryCache = new LruNormalizedCacheFactory(EvictionPolicy.NO_EVICTION,
         secondaryCacheFactory).createNormalizedCache(basicFieldAdapter);
 
     Record record = Record.builder("key").build();
 
-    primaryCacheStore.merge(record, Collections.<String, String>emptyMap());
-    primaryCacheStore.clearSecondaryCache();
+    primaryCache.merge(record, Collections.<String, String>emptyMap());
+    primaryCache.clearSecondaryCache();
 
-<<<<<<< HEAD
-    assertThat(primaryCacheStore.secondaryCache().loadRecord("key")).isNull();
-=======
-    assertThat(secondaryCacheStore.loadRecord("key", Collections.<String, String>emptyMap())).isNull();
->>>>>>> WIP
+    assertThat(primaryCache.secondaryCache().loadRecord("key", Collections.<String, String>emptyMap())).isNull();
   }
 
   private void assertTestRecordPresentAndAccurate(Record testRecord, NormalizedCache store) {

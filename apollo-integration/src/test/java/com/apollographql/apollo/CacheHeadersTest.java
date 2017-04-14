@@ -8,14 +8,18 @@ import com.apollographql.apollo.cache.normalized.CacheHeaderSpec;
 import com.apollographql.apollo.cache.normalized.CacheKey;
 import com.apollographql.apollo.cache.normalized.CacheKeyResolver;
 import com.apollographql.apollo.cache.normalized.NormalizedCache;
+import com.apollographql.apollo.cache.normalized.NormalizedCacheFactory;
 import com.apollographql.apollo.cache.normalized.Record;
+import com.apollographql.apollo.cache.normalized.RecordFieldAdapter;
 import com.apollographql.apollo.exception.ApolloException;
+import com.squareup.moshi.Moshi;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +51,7 @@ public class CacheHeadersTest {
 
   @Test
   public void testHeadersReceived() throws ApolloException, IOException {
-    final NormalizedCache normalizedCache = new NormalizedCache() {
+    final NormalizedCache normalizedCache = new NormalizedCache(RecordFieldAdapter.create(new Moshi.Builder().build())) {
       @Nullable @Override public Record loadRecord(String key, Map<String, String> cacheHeaders) {
         assertThat(cacheHeaders.containsKey(CacheHeaderSpec.DO_NOT_CACHE)).isTrue();
         return null;
@@ -55,7 +59,7 @@ public class CacheHeadersTest {
 
       @Nonnull @Override public Set<String> merge(Record record, Map<String, String> cacheHeaders) {
         assertThat(cacheHeaders.containsKey(CacheHeaderSpec.DO_NOT_CACHE)).isTrue();
-        return null;
+        return Collections.emptySet();
       }
 
       @Override public void clearAll() {
@@ -63,7 +67,14 @@ public class CacheHeadersTest {
       }
     };
 
-    ApolloClient apolloClient = ApolloClient.builder().normalizedCache(normalizedCache, new CacheKeyResolver<Map<String, Object>>() {
+    final NormalizedCacheFactory<NormalizedCache> cacheFactory = new NormalizedCacheFactory<NormalizedCache>() {
+      @Override public NormalizedCache createNormalizedCache(RecordFieldAdapter recordFieldAdapter) {
+        return normalizedCache;
+      }
+    };
+
+    ApolloClient apolloClient = ApolloClient.builder().normalizedCache(cacheFactory,
+        new CacheKeyResolver<Map<String, Object>>() {
       @Nonnull @Override public CacheKey resolve(@Nonnull Map<String, Object> objectSource) {
         return CacheKey.NO_KEY;
       }
@@ -83,7 +94,7 @@ public class CacheHeadersTest {
 
   @Test
   public void testDefaultHeadersReceived() throws IOException, ApolloException {
-    final NormalizedCache normalizedCache = new NormalizedCache() {
+    final NormalizedCache normalizedCache = new NormalizedCache(RecordFieldAdapter.create(new Moshi.Builder().build())) {
       @Nullable @Override public Record loadRecord(String key, Map<String, String> cacheHeaders) {
         assertThat(cacheHeaders.containsKey(CacheHeaderSpec.DO_NOT_CACHE)).isTrue();
         return null;
@@ -91,7 +102,7 @@ public class CacheHeadersTest {
 
       @Nonnull @Override public Set<String> merge(Record record, Map<String, String> cacheHeaders) {
         assertThat(cacheHeaders.containsKey(CacheHeaderSpec.DO_NOT_CACHE)).isTrue();
-        return null;
+        return Collections.emptySet();
       }
 
       @Override public void clearAll() {
@@ -99,10 +110,16 @@ public class CacheHeadersTest {
       }
     };
 
+    final NormalizedCacheFactory<NormalizedCache> cacheFactory = new NormalizedCacheFactory<NormalizedCache>() {
+      @Override public NormalizedCache createNormalizedCache(RecordFieldAdapter recordFieldAdapter) {
+        return normalizedCache;
+      }
+    };
+
     Map<String, String> cacheHeaders = new HashMap<>();
     cacheHeaders.put(CacheHeaderSpec.DO_NOT_CACHE, "true");
 
-    ApolloClient apolloClient = ApolloClient.builder().normalizedCache(normalizedCache, new CacheKeyResolver<Map<String, Object>>() {
+    ApolloClient apolloClient = ApolloClient.builder().normalizedCache(cacheFactory, new CacheKeyResolver<Map<String, Object>>() {
       @Nonnull @Override public CacheKey resolve(@Nonnull Map<String, Object> objectSource) {
         return CacheKey.NO_KEY;
       }

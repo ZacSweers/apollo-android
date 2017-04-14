@@ -23,8 +23,7 @@ import javax.annotation.Nullable;
  * A {@link NormalizedCache} backed by an in memory {@link Cache}. Can be configured with an optional secondaryCache
  * {@link NormalizedCache}, which will be used as a backup if a {@link Record} is not present in the primary cache.
  *
- * A common configuration is to have secondary {@link com.apollographql.apollo.cache.normalized.sql.SqlNormalizedCache}
- * cache.
+ * A common configuration is to have secondary SQL cache.
  */
 public final class LruNormalizedCache extends NormalizedCache {
 
@@ -63,25 +62,16 @@ public final class LruNormalizedCache extends NormalizedCache {
     lruCache = lruCacheBuilder.build();
   }
 
-<<<<<<< HEAD
   @Nullable public NormalizedCache secondaryCache() {
     return secondaryCache.get();
   }
 
-  @Nullable @Override public Record loadRecord(final String key) {
+  @Nullable @Override public Record loadRecord(final String key, final Map<String, String> cacheHeaders) {
     if (secondaryCache.isPresent()) {
       try {
         return lruCache.get(key, new Callable<Record>() {
           @Override public Record call() throws Exception {
-            Record record = secondaryCache.get().loadRecord(key);
-=======
-  @Nullable @Override public Record loadRecord(final String key, final Map<String, String> cacheHeaders) {
-    if (secondaryCacheStore.isPresent()) {
-      try {
-        return lruCache.get(key, new Callable<Record>() {
-          @Override public Record call() throws Exception {
-            Record record = secondaryCacheStore.get().loadRecord(key, cacheHeaders);
->>>>>>> WIP
+            Record record = secondaryCache.get().loadRecord(key, cacheHeaders);
             // get(key, callable) requires non-null. If null, an exception should be
             //thrown, which will be converted to null in the catch clause.
             if (record == null) {
@@ -97,18 +87,12 @@ public final class LruNormalizedCache extends NormalizedCache {
     return lruCache.getIfPresent(key);
   }
 
-<<<<<<< HEAD
-  @Nonnull @Override public Set<String> merge(Record apolloRecord) {
-    if (secondaryCache.isPresent()) {
-      secondaryCache.get().merge(apolloRecord);
-=======
   @Nonnull @Override public Set<String> merge(Record apolloRecord, Map<String, String> cacheHeaders) {
     if (cacheHeaders.containsKey(CacheHeaderSpec.DO_NOT_CACHE)) {
       return Collections.emptySet();
     }
-    if (secondaryCacheStore.isPresent()) {
-      secondaryCacheStore.get().merge(apolloRecord, cacheHeaders);
->>>>>>> WIP
+    if (secondaryCache.isPresent()) {
+      secondaryCache.get().merge(apolloRecord, cacheHeaders);
     }
     final Record oldRecord = lruCache.getIfPresent(apolloRecord.key());
     if (oldRecord == null) {

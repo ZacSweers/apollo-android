@@ -71,11 +71,6 @@ public class NormalizedCacheTestCase {
     return new MockResponse().setChunkedBody(Utils.readFileToString(getClass(), "/" + fileName), 32);
   }
 
-  @After
-  public void tearDown() throws IOException {
-    server.shutdown();
-  }
-
   @Test public void episodeHeroName() throws IOException, ApolloException {
     server.enqueue(mockResponse("HeroNameResponse.json"));
 

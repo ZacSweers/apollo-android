@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -92,11 +93,11 @@ public class ResponseNormalizationTest {
     Response<HeroName.Data> body = call.execute();
     assertThat(body.isSuccessful()).isTrue();
 
-    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY);
+    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY, Collections.<String, String>emptyMap());
     CacheReference reference = (CacheReference) record.field("hero");
     assertThat(reference).isEqualTo(new CacheReference("hero"));
 
-    final Record heroRecord = normalizedCache.loadRecord(reference.key());
+    final Record heroRecord = normalizedCache.loadRecord(reference.key(), Collections.<String, String>emptyMap());
     assertThat(heroRecord.field("name")).isEqualTo("R2-D2");
   }
 
@@ -110,11 +111,11 @@ public class ResponseNormalizationTest {
     Response<EpisodeHeroName.Data> body = call.execute();
     assertThat(body.isSuccessful()).isTrue();
 
-    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY);
+    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY, Collections.<String, String>emptyMap());
     CacheReference reference = (CacheReference) record.field("hero(episode:JEDI)");
     assertThat(reference).isEqualTo(new CacheReference("hero(episode:JEDI)"));
 
-    final Record heroRecord = normalizedCache.loadRecord(reference.key());
+    final Record heroRecord = normalizedCache.loadRecord(reference.key(), Collections.<String, String>emptyMap());
     assertThat(heroRecord.field("name")).isEqualTo("R2-D2");
   }
 
@@ -130,11 +131,11 @@ public class ResponseNormalizationTest {
     Response<HeroAppearsIn.Data> body = call.execute();
     assertThat(body.isSuccessful()).isTrue();
 
-    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY);
+    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY, Collections.<String, String>emptyMap());
     CacheReference heroReference = (CacheReference) record.field("hero");
     assertThat(heroReference).isEqualTo(new CacheReference("hero"));
 
-    final Record hero = normalizedCache.loadRecord(heroReference.key());
+    final Record hero = normalizedCache.loadRecord(heroReference.key(), Collections.<String, String>emptyMap());
     assertThat(hero.field("appearsIn")).isEqualTo(Arrays.asList("NEWHOPE", "EMPIRE", "JEDI"));
   }
 
@@ -148,11 +149,11 @@ public class ResponseNormalizationTest {
     Response<HeroAndFriendsNames.Data> body = call.execute();
     assertThat(body.isSuccessful()).isTrue();
 
-    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY);
+    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY, Collections.<String, String>emptyMap());
     CacheReference heroReference = (CacheReference) record.field("hero(episode:JEDI)");
     assertThat(heroReference).isEqualTo(new CacheReference("hero(episode:JEDI)"));
 
-    final Record heroRecord = normalizedCache.loadRecord(heroReference.key());
+    final Record heroRecord = normalizedCache.loadRecord(heroReference.key(), Collections.<String, String>emptyMap());
     assertThat(heroRecord.field("name")).isEqualTo("R2-D2");
 
     assertThat(heroRecord.field("friends")).isEqualTo(Arrays.asList(
@@ -161,7 +162,8 @@ public class ResponseNormalizationTest {
         new CacheReference("hero(episode:JEDI).friends.2")
     ));
 
-    final Record luke = normalizedCache.loadRecord("hero(episode:JEDI).friends.0");
+    final Record luke = normalizedCache.loadRecord("hero(episode:JEDI).friends.0",
+        Collections.<String, String>emptyMap());
     assertThat(luke.field("name")).isEqualTo("Luke Skywalker");
   }
 
@@ -175,11 +177,11 @@ public class ResponseNormalizationTest {
     Response<HeroAndFriendsNamesWithIDs.Data> body = call.execute();
     assertThat(body.isSuccessful()).isTrue();
 
-    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY);
+    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY, Collections.<String, String>emptyMap());
     CacheReference heroReference = (CacheReference) record.field("hero(episode:JEDI)");
     assertThat(heroReference).isEqualTo(new CacheReference("2001"));
 
-    final Record heroRecord = normalizedCache.loadRecord(heroReference.key());
+    final Record heroRecord = normalizedCache.loadRecord(heroReference.key(), Collections.<String, String>emptyMap());
     assertThat(heroRecord.field("name")).isEqualTo("R2-D2");
 
     assertThat(heroRecord.field("friends")).isEqualTo(Arrays.asList(
@@ -188,7 +190,7 @@ public class ResponseNormalizationTest {
         new CacheReference("1003")
     ));
 
-    final Record luke = normalizedCache.loadRecord("1000");
+    final Record luke = normalizedCache.loadRecord("1000", Collections.<String, String>emptyMap());
     assertThat(luke.field("name")).isEqualTo("Luke Skywalker");
   }
 
@@ -203,11 +205,11 @@ public class ResponseNormalizationTest {
     Response<HeroAndFriendsNamesWithIDForParentOnly.Data> body = call.execute();
     assertThat(body.isSuccessful()).isTrue();
 
-    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY);
+    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY, Collections.<String, String>emptyMap());
     CacheReference heroReference = (CacheReference) record.field("hero(episode:JEDI)");
     assertThat(heroReference).isEqualTo(new CacheReference("2001"));
 
-    final Record heroRecord = normalizedCache.loadRecord(heroReference.key());
+    final Record heroRecord = normalizedCache.loadRecord(heroReference.key(), Collections.<String, String>emptyMap());
     assertThat(heroRecord.field("name")).isEqualTo("R2-D2");
 
     assertThat(heroRecord.field("friends")).isEqualTo(Arrays.asList(
@@ -216,7 +218,7 @@ public class ResponseNormalizationTest {
         new CacheReference("2001.friends.2")
     ));
 
-    final Record luke = normalizedCache.loadRecord("2001.friends.0");
+    final Record luke = normalizedCache.loadRecord("2001.friends.0", Collections.<String, String>emptyMap());
     assertThat(luke.field("name")).isEqualTo("Luke Skywalker");
   }
 
@@ -231,10 +233,12 @@ public class ResponseNormalizationTest {
     Response<SameHeroTwice.Data> body = call.execute();
     assertThat(body.isSuccessful()).isTrue();
 
-    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY);
+    Record record = normalizedCache
+        .loadRecord(QUERY_ROOT_KEY, Collections.<String, String>emptyMap());
     CacheReference heroReference = (CacheReference) record.field("hero");
 
-    final Record hero = normalizedCache.loadRecord(heroReference.key());
+    final Record hero = normalizedCache.loadRecord(heroReference.key(),
+        Collections.<String, String>emptyMap());
     assertThat(hero.field("name")).isEqualTo("R2-D2");
     assertThat(hero.field("appearsIn")).isEqualTo(Arrays.asList("NEWHOPE", "EMPIRE", "JEDI"));
   }
@@ -250,10 +254,10 @@ public class ResponseNormalizationTest {
     Response<HeroTypeDependentAliasedField.Data> body = call.execute();
     assertThat(body.isSuccessful()).isTrue();
 
-    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY);
+    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY, Collections.<String, String>emptyMap());
     CacheReference heroReference = (CacheReference) record.field("hero(episode:JEDI)");
 
-    final Record hero = normalizedCache.loadRecord(heroReference.key());
+    final Record hero = normalizedCache.loadRecord(heroReference.key(), Collections.<String, String>emptyMap());
     assertThat(hero.field("primaryFunction")).isEqualTo("Astromech");
     assertThat(hero.field("__typename")).isEqualTo("Droid");
   }
@@ -269,10 +273,10 @@ public class ResponseNormalizationTest {
     Response<HeroTypeDependentAliasedField.Data> body = call.execute();
     assertThat(body.isSuccessful()).isTrue();
 
-    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY);
+    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY, Collections.<String, String>emptyMap());
     CacheReference heroReference = (CacheReference) record.field("hero(episode:EMPIRE)");
 
-    final Record hero = normalizedCache.loadRecord(heroReference.key());
+    final Record hero = normalizedCache.loadRecord(heroReference.key(), Collections.<String, String>emptyMap());
     assertThat(hero.field("homePlanet")).isEqualTo("Tatooine");
     assertThat(hero.field("__typename")).isEqualTo("Human");
   }
@@ -288,10 +292,10 @@ public class ResponseNormalizationTest {
     Response<HeroTypeDependentAliasedField.Data> body = call.execute();
     assertThat(body.isSuccessful()).isTrue();
 
-    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY);
+    Record record = normalizedCache.loadRecord(QUERY_ROOT_KEY, Collections.<String, String>emptyMap());
     CacheReference heroReference = (CacheReference) record.field("hero(episode:EMPIRE)");
 
-    final Record hero = normalizedCache.loadRecord(heroReference.key());
+    final Record hero = normalizedCache.loadRecord(heroReference.key(), Collections.<String, String>emptyMap());
     assertThat(hero.field("homePlanet")).isEqualTo("Tatooine");
     assertThat(hero.field("__typename")).isEqualTo("Human");
   }
@@ -306,11 +310,14 @@ public class ResponseNormalizationTest {
     Response<HeroParentTypeDependentField.Data> body = call.execute();
     assertThat(body.isSuccessful()).isTrue();
 
-    Record lukeRecord = normalizedCache.loadRecord("hero(episode:JEDI).friends.0");
+    Record lukeRecord = normalizedCache
+        .loadRecord("hero(episode:JEDI).friends.0", Collections.<String,
+            String>emptyMap());
     assertThat(lukeRecord.field("name")).isEqualTo("Luke Skywalker");
     assertThat(lukeRecord.field("height(unit:METER)")).isEqualTo(BigDecimal.valueOf(1.72));
 
-    final List<Object> friends = (List<Object>) normalizedCache.loadRecord("hero(episode:JEDI)").field("friends");
+    final List<Object> friends = (List<Object>) normalizedCache
+        .loadRecord("hero(episode:JEDI)", Collections.<String, String>emptyMap()).field("friends");
     assertThat(friends.get(0)).isEqualTo(new CacheReference("hero(episode:JEDI).friends.0"));
     assertThat(friends.get(1)).isEqualTo(new CacheReference("hero(episode:JEDI).friends.1"));
     assertThat(friends.get(2)).isEqualTo(new CacheReference("hero(episode:JEDI).friends.2"));
@@ -326,7 +333,8 @@ public class ResponseNormalizationTest {
     Response<HeroParentTypeDependentField.Data> body = call.execute();
     assertThat(body.isSuccessful()).isTrue();
 
-    Record lukeRecord = normalizedCache.loadRecord("hero(episode:EMPIRE).friends.0");
+    Record lukeRecord = normalizedCache
+        .loadRecord("hero(episode:EMPIRE).friends.0", Collections.<String, String>emptyMap());
     assertThat(lukeRecord.field("name")).isEqualTo("Han Solo");
     assertThat(lukeRecord.field("height(unit:FOOT)")).isEqualTo(BigDecimal.valueOf(5.905512));
   }
