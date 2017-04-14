@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  *  A {@link NormalizedCache} is recommended to implement support for CacheHeaders specified in {@link CacheHeaderSpec}.
  *
  * A {@link NormalizedCache} can choose to store records in any manner.
- * See {@link com.apollographql.apollo.cache.normalized.sql.SqlNormalizedCache} for a persistent cache.
+ *
  * See {@link com.apollographql.apollo.cache.normalized.lru.LruNormalizedCache} for a in memory cache.
  */
 public abstract class NormalizedCache {
