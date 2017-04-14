@@ -18,12 +18,10 @@ import javax.annotation.Nullable;
  * If {@link NormalizedCache#loadRecords(Collection, Map)} returns an empty set while, the request will be considered a
  * cache-miss.
  *
-<<<<<<< HEAD
  * To serialize a {@link Record} to a standardized form use {@link #recordAdapter()} which handles
  * call custom scalar types registered on the {@link ApolloClient}.
-=======
- * A {@link NormalizedCache} is recommended to implement support for CacheHeaders specified in {@link CacheHeaderSpec}.
->>>>>>> WIP
+ *
+ *  A {@link NormalizedCache} is recommended to implement support for CacheHeaders specified in {@link CacheHeaderSpec}.
  *
  * A {@link NormalizedCache} can choose to store records in any manner.
  * See {@link com.apollographql.apollo.cache.normalized.sql.SqlNormalizedCache} for a persistent cache.
