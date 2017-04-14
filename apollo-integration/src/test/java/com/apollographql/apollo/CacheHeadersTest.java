@@ -4,7 +4,7 @@ import com.apollographql.android.impl.normalizer.HeroAndFriendsNames;
 import com.apollographql.android.impl.normalizer.type.Episode;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.cache.normalized.CacheControl;
-import com.apollographql.apollo.cache.normalized.CacheHeaderSpec;
+import com.apollographql.apollo.cache.normalized.StandardCacheHeaders;
 import com.apollographql.apollo.cache.normalized.CacheKey;
 import com.apollographql.apollo.cache.normalized.CacheKeyResolver;
 import com.apollographql.apollo.cache.normalized.NormalizedCache;
@@ -53,12 +53,12 @@ public class CacheHeadersTest {
   public void testHeadersReceived() throws ApolloException, IOException {
     final NormalizedCache normalizedCache = new NormalizedCache(RecordFieldAdapter.create(new Moshi.Builder().build())) {
       @Nullable @Override public Record loadRecord(String key, Map<String, String> cacheHeaders) {
-        assertThat(cacheHeaders.containsKey(CacheHeaderSpec.DO_NOT_CACHE)).isTrue();
+        assertThat(cacheHeaders.containsKey(StandardCacheHeaders.DO_NOT_CACHE)).isTrue();
         return null;
       }
 
       @Nonnull @Override public Set<String> merge(Record record, Map<String, String> cacheHeaders) {
-        assertThat(cacheHeaders.containsKey(CacheHeaderSpec.DO_NOT_CACHE)).isTrue();
+        assertThat(cacheHeaders.containsKey(StandardCacheHeaders.DO_NOT_CACHE)).isTrue();
         return Collections.emptySet();
       }
 
@@ -85,7 +85,7 @@ public class CacheHeadersTest {
 
     server.enqueue(mockResponse("HeroAndFriendsNameResponse.json"));
     Map<String, String> cacheHeaders = new HashMap<>();
-    cacheHeaders.put(CacheHeaderSpec.DO_NOT_CACHE, "true");
+    cacheHeaders.put(StandardCacheHeaders.DO_NOT_CACHE, "true");
     final Response<HeroAndFriendsNames.Data> response
         = apolloClient.newCall(new HeroAndFriendsNames(Episode.NEWHOPE))
         .cacheControl(cacheHeaders)
@@ -96,12 +96,12 @@ public class CacheHeadersTest {
   public void testDefaultHeadersReceived() throws IOException, ApolloException {
     final NormalizedCache normalizedCache = new NormalizedCache(RecordFieldAdapter.create(new Moshi.Builder().build())) {
       @Nullable @Override public Record loadRecord(String key, Map<String, String> cacheHeaders) {
-        assertThat(cacheHeaders.containsKey(CacheHeaderSpec.DO_NOT_CACHE)).isTrue();
+        assertThat(cacheHeaders.containsKey(StandardCacheHeaders.DO_NOT_CACHE)).isTrue();
         return null;
       }
 
       @Nonnull @Override public Set<String> merge(Record record, Map<String, String> cacheHeaders) {
-        assertThat(cacheHeaders.containsKey(CacheHeaderSpec.DO_NOT_CACHE)).isTrue();
+        assertThat(cacheHeaders.containsKey(StandardCacheHeaders.DO_NOT_CACHE)).isTrue();
         return Collections.emptySet();
       }
 
@@ -117,7 +117,7 @@ public class CacheHeadersTest {
     };
 
     Map<String, String> cacheHeaders = new HashMap<>();
-    cacheHeaders.put(CacheHeaderSpec.DO_NOT_CACHE, "true");
+    cacheHeaders.put(StandardCacheHeaders.DO_NOT_CACHE, "true");
 
     ApolloClient apolloClient = ApolloClient.builder().normalizedCache(cacheFactory, new CacheKeyResolver<Map<String, Object>>() {
       @Nonnull @Override public CacheKey resolve(@Nonnull Map<String, Object> objectSource) {

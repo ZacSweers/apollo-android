@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
  * To serialize a {@link Record} to a standardized form use {@link #recordAdapter()} which handles
  * call custom scalar types registered on the {@link ApolloClient}.
  *
- *  A {@link NormalizedCache} is recommended to implement support for CacheHeaders specified in {@link CacheHeaderSpec}.
+ *  A {@link NormalizedCache} is recommended to implement support for CacheHeaders specified in {@link StandardCacheHeaders}.
  *
  * A {@link NormalizedCache} can choose to store records in any manner.
  *

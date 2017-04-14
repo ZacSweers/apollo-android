@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
 import com.apollographql.apollo.api.internal.Optional;
-import com.apollographql.apollo.cache.normalized.CacheHeaderSpec;
+import com.apollographql.apollo.cache.normalized.StandardCacheHeaders;
 import com.apollographql.apollo.cache.normalized.NormalizedCache;
 import com.apollographql.apollo.cache.normalized.Record;
 import com.apollographql.apollo.cache.normalized.RecordFieldAdapter;
@@ -60,7 +60,7 @@ public final class SqlNormalizedCache extends NormalizedCache {
   }
 
   @Nonnull public Set<String> merge(Record apolloRecord, Map<String, String> cacheHeaders) {
-    if (cacheHeaders.containsKey(CacheHeaderSpec.DO_NOT_CACHE)) {
+    if (cacheHeaders.containsKey(StandardCacheHeaders.DO_NOT_CACHE)) {
       return Collections.emptySet();
     }
     Optional<Record> optionalOldRecord = selectRecordForKey(apolloRecord.key());
@@ -79,7 +79,7 @@ public final class SqlNormalizedCache extends NormalizedCache {
   }
 
   @Nonnull @Override public Set<String> merge(Collection<Record> recordSet, Map<String, String> cacheHeaders) {
-    if (cacheHeaders.containsKey(CacheHeaderSpec.DO_NOT_CACHE)) {
+    if (cacheHeaders.containsKey(StandardCacheHeaders.DO_NOT_CACHE)) {
       return Collections.emptySet();
     }
     Set<String> changedKeys = Collections.emptySet();

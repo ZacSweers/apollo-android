@@ -2,7 +2,7 @@ package com.apollographql.apollo.cache.normalized.lru;
 
 import com.apollographql.apollo.api.internal.Function;
 import com.apollographql.apollo.api.internal.Optional;
-import com.apollographql.apollo.cache.normalized.CacheHeaderSpec;
+import com.apollographql.apollo.cache.normalized.StandardCacheHeaders;
 import com.apollographql.apollo.cache.normalized.NormalizedCache;
 import com.apollographql.apollo.cache.normalized.NormalizedCacheFactory;
 import com.apollographql.apollo.cache.normalized.Record;
@@ -88,7 +88,7 @@ public final class LruNormalizedCache extends NormalizedCache {
   }
 
   @Nonnull @Override public Set<String> merge(Record apolloRecord, Map<String, String> cacheHeaders) {
-    if (cacheHeaders.containsKey(CacheHeaderSpec.DO_NOT_CACHE)) {
+    if (cacheHeaders.containsKey(StandardCacheHeaders.DO_NOT_CACHE)) {
       return Collections.emptySet();
     }
     if (secondaryCache.isPresent()) {

@@ -4,6 +4,7 @@ import com.apollographql.apollo.api.Operation;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.cache.http.HttpCacheControl;
 import com.apollographql.apollo.cache.normalized.CacheControl;
+import com.apollographql.apollo.cache.normalized.StandardCacheHeaders;
 import com.apollographql.apollo.exception.ApolloException;
 import com.apollographql.apollo.exception.ApolloHttpException;
 import com.apollographql.apollo.exception.ApolloNetworkException;
@@ -68,7 +69,7 @@ public interface ApolloCall<T> extends Cancelable {
    *
    * @param cacheHeaders the cache headers that will be passed with records generated from this request to {@link
    *                     com.apollographql.apollo.cache.normalized.NormalizedCache}. Standardized cache headers are
-   *                     defined in {@link com.apollographql.apollo.cache.normalized.CacheHeaderSpec}.
+   *                     defined in {@link StandardCacheHeaders}.
    * @return The ApolloCall object with the provided CacheControl strategy
    */
   @Nonnull ApolloCall<T> cacheControl(@Nonnull Map<String, String> cacheHeaders);
@@ -79,7 +80,7 @@ public interface ApolloCall<T> extends Cancelable {
    * @param cacheControl the CacheControl strategy to set
    * @param cacheHeaders the cache headers that will be passed with records generated from this request to {@link
    *                     com.apollographql.apollo.cache.normalized.NormalizedCache}. Standardized cache headers are
-   *                     defined in {@link com.apollographql.apollo.cache.normalized.CacheHeaderSpec}.
+   *                     defined in {@link StandardCacheHeaders}.
    * @return The ApolloCall object with the provided CacheControl strategy
    */
   @Nonnull ApolloCall<T> cacheControl(@Nonnull CacheControl cacheControl, @Nonnull Map<String, String> cacheHeaders);
